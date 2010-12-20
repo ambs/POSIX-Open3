@@ -162,7 +162,7 @@ if (POSIX::Open3::DO_SPAWN) {
 }
 
 # RT 66224
-SKIP {
+SKIP: {
     skip "Under windows...", 7 if $^O eq "MSWin32";
 
     open(SAVE_STDOUT,">&",STDOUT) or die "save stdout failed";
