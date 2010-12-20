@@ -162,16 +162,19 @@ if (POSIX::Open3::DO_SPAWN) {
 }
 
 # RT 66224
-open(SAVE_STDOUT,">&",STDOUT) or die "save stdout failed";
-my $dev_null = File::Spec->devnull;
+SKIP {
+    skip "Under windows...", 7 if $^O eq "MSWin32";
 
-# open(DEVNULL,'<', $dev_null) or die "open '$dev_null' failed: $!";
+    open(SAVE_STDOUT,">&",STDOUT) or die "save stdout failed";
+    my $dev_null = File::Spec->devnull;
 
-# Now set STDOUT to a filehandle on a new descriptor
-open(FH1,'>', $dev_null) or die "open '$dev_null' failed: $!";
-*STDOUT = *FH1;
+    # open(DEVNULL,'<', $dev_null) or die "open '$dev_null' failed: $!";
 
-open3(*PIPEIN, *PIPEOUT, undef, $perl, '-e', cmd_line(<<'EOF')) or die "open3 failed";
+    # Now set STDOUT to a filehandle on a new descriptor
+    open(FH1,'>', $dev_null) or die "open '$dev_null' failed: $!";
+    *STDOUT = *FH1;
+
+    open3(*PIPEIN, *PIPEOUT, undef, $perl, '-e', cmd_line(<<'EOF')) or die "open3 failed";
    print "stdout 1\n";
    print "stdout 2\n";
    print "stdout 3\n";
@@ -182,23 +185,23 @@ open3(*PIPEIN, *PIPEOUT, undef, $perl, '-e', cmd_line(<<'EOF')) or die "open3 fa
    print $a;
 EOF
 
-print PIPEIN "stdin\n";
-for my $j (1..2) {
-    for my $i (1..3) {
-        $_ = <PIPEOUT> || "nothing more";
-        chomp;
-        like $_, qr/^std(out|err) $i/;
+    print PIPEIN "stdin\n";
+    for my $j (1..2) {
+        for my $i (1..3) {
+            $_ = <PIPEOUT> || "nothing more";
+            chomp;
+            like $_, qr/^std(out|err) $i/;
+        }
     }
+    $_ = <PIPEOUT> || "nothing more";
+    chomp;
+    like $_, qr/^stdin/;
+
+    close(PIPEOUT) or die "close pipe failed";
+
+    # And restore stdout
+    open(STDOUT,">&",*SAVE_STDOUT) or die "restore stout failed";
 }
-$_ = <PIPEOUT> || "nothing more";
-chomp;
-like $_, qr/^stdin/;
-
-close(PIPEOUT) or die "close pipe failed";
-
-# And restore stdout
-open(STDOUT,">&",*SAVE_STDOUT) or die "restore stout failed";
-
 
 
 sub my_is {

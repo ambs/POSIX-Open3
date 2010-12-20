@@ -170,7 +170,7 @@ The order of arguments differs from that of open2().
 
 our $Me = 'open3 (bug)';	# you should never see this, it's always localized
 
-sub win { $^O eq "MSWin32"; 0 }
+sub under_windows() { $^O eq "MSWin32" }
 
 # Fatal.pm needs to be fixed WRT prototypes.
 
@@ -271,7 +271,7 @@ sub _open3 {
 		untie *STDIN;
 		untie *STDOUT;
 
-                if (win) { ## Non Standard
+                if (under_windows()) { ## Non Standard
                     open(STDOUT, ">&=1");
                     open(STDERR, ">&=2");
                 }
@@ -289,7 +289,7 @@ sub _open3 {
 		}
 
 		if ($dup_wtr) {
-                    if (win) {
+                    if (under_windows()) {
                         xopen \*STDIN,  "<&$dad_wtr" if fileno(STDIN) != xfileno($dad_wtr);
                     } else {
                         POSIX::dup2(xfileno($dad_wtr), 0) if 0 != xfileno($dad_wtr);
@@ -297,21 +297,21 @@ sub _open3 {
 
 		} else {
 		    xclose $dad_wtr;
-                    if (win) {
+                    if (under_windows()) {
                         xopen \*STDIN,  "<&=" . fileno $kid_rdr;
                     } else {
                         POSIX::dup2(fileno($kid_rdr), 0);
                     }
 		}
 		if ($dup_rdr) {
-                    if (win) {
+                    if (under_windows()) {
                         xopen \*STDOUT, ">&$dad_rdr" if fileno(STDOUT) != xfileno($dad_rdr);
                     } else {
                         POSIX::dup2(xfileno($dad_rdr), 1) if 1 != xfileno($dad_rdr);
                     }
 		} else {
 		    xclose $dad_rdr;
-                    if (win) {
+                    if (under_windows()) {
                         xopen \*STDOUT, ">&=" . fileno $kid_wtr;
                     } else {
                         POSIX::dup2(fileno($kid_wtr), 1);
@@ -322,7 +322,7 @@ sub _open3 {
 			# I have to use a fileno here because in this one case
 			# I'm doing a dup but the filehandle might be a reference
 			# (from the special case above).
-                        if (win) {
+                        if (under_windows()) {
                             xopen \*STDERR, ">&" . xfileno($dad_err)
                               if fileno(STDERR) != xfileno($dad_err);
                         } else {
@@ -331,7 +331,7 @@ sub _open3 {
                         }
 		    } else {
 			xclose $dad_err;
-                        if (win) {
+                        if (under_windows()) {
                             xopen \*STDERR, ">&=" . fileno $kid_err;
                         } else {
                             POSIX::dup2(fileno($kid_err), 2);
@@ -339,7 +339,7 @@ sub _open3 {
 		    }
 		} else {
                     if (fileno(STDERR) != fileno(STDOUT)) {
-                        if (win) {
+                        if (under_windows()) {
                             xopen \*STDERR, ">&STDOUT";
                         } else {
                             POSIX::dup2(1, 2);
@@ -459,7 +459,7 @@ sub spawn_with_handles {
 	$fd->{handle}->fdopen($saved{fileno $fd->{open_as}} || $fd->{open_as},
 			      $fd->{mode});
     }
-    unless (win) {
+    unless (under_windows()) {
 	# Stderr may be redirected below, so we save the err text:
 	foreach $fd (@$close_in_child) {
 	    fcntl($fd, Fcntl::F_SETFD(), 1) or push @errs, "fcntl $fd: $!"
