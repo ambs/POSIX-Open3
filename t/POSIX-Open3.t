@@ -62,7 +62,8 @@ $pid = open3 'WRITE', 'READ', 'READ', $perl, '-e', cmd_line(<<'EOF');
     print STDERR scalar <STDIN>;
 EOF
 print WRITE "$desc\n";
-is(scalar <READ>, "$desc\n");
+chomp (my $l = <READ>);
+is($l, $desc);
 print WRITE "$desc [again]\n";
 is(scalar <READ>, "$desc [again]\n");
 waitpid $pid, 0;
