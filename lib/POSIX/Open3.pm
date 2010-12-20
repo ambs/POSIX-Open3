@@ -46,6 +46,13 @@ fixed and a stable Perl release is done.
 
 Follows the documentation from C<IPC::Open3>.
 
+=head2 Windows
+
+Under windows the code run with this module is almost the same as the
+one available with IPC::Open3. We just force the standard output and
+standard error re-opening to the default file handles in the child
+process.
+
 =head1 DESCRIPTION
 
 Extremely similar to open2(), open3() spawns the given $cmd and
@@ -264,7 +271,7 @@ sub _open3 {
 		untie *STDIN;
 		untie *STDOUT;
 
-                if (win) {
+                if (win) { ## Non Standard
                     open(STDOUT, ">&=1");
                     open(STDERR, ">&=2");
                 }
