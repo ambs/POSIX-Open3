@@ -170,7 +170,7 @@ The order of arguments differs from that of open2().
 
 our $Me = 'open3 (bug)';	# you should never see this, it's always localized
 
-sub win { $^O eq "MSWin32" }
+sub win { $^O eq "MSWin32"; 0 }
 
 # Fatal.pm needs to be fixed WRT prototypes.
 

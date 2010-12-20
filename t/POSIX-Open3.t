@@ -171,9 +171,16 @@ my $dev_null = File::Spec->devnull;
 open(FH1,'>', $dev_null) or die "open '$dev_null' failed: $!";
 *STDOUT = *FH1;
 
-open3(*PIPEIN, *PIPEOUT, undef, $^X, '-e',
-      'print qq(stdout 1\\nstdout 2\\nstdout 3\\n); print STDERR qq(stderr 1\\nstderr 2\\nstderr 3\\n); $a = <STDIN>; print $a')
-  or die "open3 failed";
+open3(*PIPEIN, *PIPEOUT, undef, $perl, '-e', cmd_line(<<'EOF')) or die "open3 failed";
+   print "stdout 1\n";
+   print "stdout 2\n";
+   print "stdout 3\n";
+   print STDERR "stderr 1\n";
+   print STDERR "stderr 2\n";
+   print STDERR "stderr 3\n";
+   $a = <STDIN>;
+   print $a;
+EOF
 
 print PIPEIN "stdin\n";
 for my $j (1..2) {
