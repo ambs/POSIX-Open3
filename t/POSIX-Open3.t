@@ -65,7 +65,7 @@ print WRITE "$desc\n";
 my_is(scalar <READ>, "$desc\n");
 
 print WRITE "$desc [again]\n";
-is(scalar <READ>, "$desc [again]\n");
+my_is(scalar <READ>, "$desc [again]\n");
 waitpid $pid, 0;
 
 $desc = "read and error together, error empty";
@@ -78,7 +78,7 @@ print WRITE "$desc\n";
 my_is(scalar <READ>, "$desc\n");
 
 print WRITE "$desc [again]\n";
-is(scalar <READ>, "$desc [again]\n");
+my_is(scalar <READ>, "$desc [again]\n");
 waitpid $pid, 0;
 
 is(pipe(PIPE_READ, PIPE_WRITE), 1);
@@ -87,7 +87,7 @@ $pid = open3 '<&PIPE_READ', 'READ', '',
 close PIPE_READ;
 print PIPE_WRITE "dup writer\n";
 close PIPE_WRITE;
-is(scalar <READ>, "dup writer\n");
+my_is(scalar <READ>, "dup writer\n");
 waitpid $pid, 0;
 
 my $TB = Test::Builder->new();
