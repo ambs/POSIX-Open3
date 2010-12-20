@@ -62,8 +62,8 @@ $pid = open3 'WRITE', 'READ', 'READ', $perl, '-e', cmd_line(<<'EOF');
     print STDERR scalar <STDIN>;
 EOF
 print WRITE "$desc\n";
-chomp (my $l = <READ>);
-is($l, $desc);
+my_is(scalar <READ>, "$desc\n");
+
 print WRITE "$desc [again]\n";
 is(scalar <READ>, "$desc [again]\n");
 waitpid $pid, 0;
@@ -75,7 +75,8 @@ $pid = open3 'WRITE', 'READ', '', $perl, '-e', cmd_line(<<'EOF');
     print STDERR scalar <STDIN>;
 EOF
 print WRITE "$desc\n";
-is(scalar <READ>, "$desc\n");
+my_is(scalar <READ>, "$desc\n");
+
 print WRITE "$desc [again]\n";
 is(scalar <READ>, "$desc [again]\n");
 waitpid $pid, 0;
@@ -190,3 +191,11 @@ close(PIPEOUT) or die "close pipe failed";
 
 # And restore stdout
 open(STDOUT,">&",*SAVE_STDOUT) or die "restore stout failed";
+
+
+
+sub my_is {
+    my $l = shift;
+    $l =~ s/\r//g;
+    is ($l, shift @_);
+}
