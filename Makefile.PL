@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use 5.008006;
 
 WriteMakefile(
     NAME                => 'POSIX::Open3',

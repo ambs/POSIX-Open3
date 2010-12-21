@@ -1,5 +1,7 @@
 package POSIX::Open3;
 
+use 5.008006;
+
 use strict;
 no strict 'refs'; # because users pass me bareword filehandles
 our ($VERSION, @ISA, @EXPORT);
@@ -11,7 +13,7 @@ use Symbol qw(gensym qualify);
 use POSIX ();
 
 # $VERSION	= 1.08;
-$VERSION        = '0.01';
+$VERSION        = '0.02';
 @ISA		= qw(Exporter);
 @EXPORT		= qw(open3);
 
